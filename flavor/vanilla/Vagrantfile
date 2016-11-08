@@ -1,0 +1,15 @@
+BOX_NAME = ENV['BOX_NAME']
+FLAVOR_DIR = ENV['FLAVOR_DIR']
+
+Vagrant.configure(2) do |config|
+  config.vm.box = BOX_NAME
+  config.vm.provider 'vmware_fusion' do |v|
+    v.gui = false
+  end
+  config.ssh.insert_key = false
+  config.vm.provision 'shell', inline: 'sleep 60'
+  Dir.glob("#{FLAVOR_DIR}/scripts/*.sh") do |sh_file|
+    config.vm.provision 'shell', path: sh_file, privileged: sh_file !~ /unprivileged/
+  end
+  config.vm.provision 'shell', inline: 'softwareupdate -i -a --verbose'
+end

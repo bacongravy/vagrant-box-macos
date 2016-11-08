@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ENV["VAGRANT_DEFAULT_PROVIDER"] = "vmware_fusion"
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "macos-autoinstall"
+  config.vm.boot_timeout = 3600
+  config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.ssh.insert_key = false
+  config.vm.provider "vmware_fusion" do |v|
+    # v.gui = true
+    v.vmx["sata0:0.present"] = "TRUE"
+    v.vmx["sata0:0.fileName"] = File.expand_path(__dir__) + "/disk.vmdk"
+    v.vmx["sata0:1.present"] = "TRUE"
+    v.vmx["sata0:1.autodetect"] = "TRUE"
+    v.vmx["sata0:1.deviceType"] = "cdrom-image"
+    v.vmx["sata0:1.startConnected"] = "TRUE"
+    v.vmx["sata0:1.fileName"] = File.expand_path(__dir__) + "/cdrom.dmg"
+  end
+  config.vm.provision "shell", inline: "date > /etc/box_build_time"
+  config.vm.provision "shell", inline: "dseditgroup -o create vagrant"
+  config.vm.provision "shell", inline: "dseditgroup -o edit -a vagrant vagrant"
+end

@@ -1,0 +1,4 @@
+diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk0
+if [ "\$?" == "1" ]; then
+  diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk1
+fi

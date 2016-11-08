@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm /etc/rc.installer_cleanup
+
+/etc/rc.vagrant &
+
+exit 0

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+TARGET_VOLUME=${3}
+USER_NAME="vagrant"
+
+PLIST_BUDDY="/usr/libexec/PlistBuddy"
+
+# Finish the VMware Tools installation
+
+VMWARE_MOUNT_VMHGFS="/Library/Application Support/VMware Tools/mount_vmhgfs"
+VMWARE_FILESYSTEM_RESOURCES="$TARGET_VOLUME/Library/Filesystems/vmhgfs.fs/Contents/Resources"
+
+mkdir -p "$VMWARE_FILESYSTEM_RESOURCES"
+ln -s "$VMWARE_MOUNT_VMHGFS" "$VMWARE_FILESYSTEM_RESOURCES/"
+
+# Enable ssh
+
+LAUNCHD_PLIST="$TARGET_VOLUME/private/var/db/com.apple.xpc.launchd/disabled.plist"
+"$PLIST_BUDDY" -c 'Delete :com.openssh.sshd' "$LAUNCHD_PLIST"
+"$PLIST_BUDDY" -c 'Add :com.openssh.sshd bool False' "$LAUNCHD_PLIST"
+
+# Disable the screensaver at loginwindow
+
+"$PLIST_BUDDY" -c 'Add :loginWindowIdleTime integer 0' "$TARGET_VOLUME/Library/Preferences/com.apple.screensaver.plist"

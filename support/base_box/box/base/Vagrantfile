@@ -1,0 +1,11 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ENV["VAGRANT_DEFAULT_PROVIDER"] = "vmware_fusion"
+
+Vagrant.configure(2) do |config|
+  config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", disabled: true
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provider "vmware_fusion" do |v|
+    v.gui = true
+  end
+end
