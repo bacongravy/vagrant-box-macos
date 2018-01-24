@@ -136,6 +136,10 @@ if [ $PRODUCTVERSION_MAJOR -lt 10 ]; then
   bail "The version of macOS detected is not new enough, this script requires 10.10 or later!"
 fi
 
+if [ $PRODUCTVERSION_MAJOR -eq 12 -a $PRODUCTVERSION_MINOR -gt 3 ] || [ $PRODUCTVERSION_MAJOR -gt 12 ]; then
+  bail "The version of macOS detected is too new, this script requires 10.12.3 or earlier!"
+fi
+
 #####
 
 log_info "Creating a new read-write image and restoring the BaseSystem image to it..."
