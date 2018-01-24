@@ -81,12 +81,15 @@ done
 
 log_info "Booting the base box and provisioning..."
 
-mkdir $FLAVOR_PROJECT_DIR
-cp $FLAVOR_DIR/Vagrantfile $FLAVOR_PROJECT_DIR/
+mkdir "$FLAVOR_PROJECT_DIR"
+cp "$FLAVOR_DIR/Vagrantfile" "$FLAVOR_PROJECT_DIR/"
 
-pushd $FLAVOR_PROJECT_DIR
+pushd "$FLAVOR_PROJECT_DIR"
 
 vagrant up
+if [ -x "$FLAVOR_DIR/provision" ]; then
+  "$FLAVOR_DIR/provision"
+fi
 vagrant halt
 
 #####

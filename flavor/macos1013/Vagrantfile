@@ -1,0 +1,12 @@
+BOX_NAME = ENV['BOX_NAME']
+FLAVOR_DIR = ENV['FLAVOR_DIR']
+
+Vagrant.configure(2) do |config|
+  config.vm.box = BOX_NAME
+  config.vm.provider 'vmware_fusion' do |v|
+    v.gui = false
+  end
+  config.ssh.insert_key = false
+  sync_dir = "/Applications/Install macOS High Sierra.app"
+  config.vm.synced_folder sync_dir, sync_dir, create: true
+end

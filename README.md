@@ -8,22 +8,24 @@ Scripts for building Vagrant boxes for VMware Fusion that boot macOS.
 
 These scripts can be chained together by using the `vagrant-box-macos.rb` wrapper script, building a provisioned box from a macOS installer app in one step.
 
-These scripts support building boxes with OS X 10.10 Yosemite, OS X 10.11 El Capitan, and macOS 10.12 Sierra guest operating systems.
+These scripts support building boxes with OS X 10.10 Yosemite, OS X 10.11 El Capitan, macOS 10.12 Sierra (up to 10.12.3), and macOS 10.13 High Sierra guest operating systems.
+
+Note that due to changes in the OS, starting with guest OS version macOS 10.12.4 (and including 10.13), these scripts cannot be used to create autoinstall images or base boxes directly from the installer apps for those versions. Instead, to create a box with a 10.13 guest, you must use the macos1013 flavor to upgrade an existing base box running an earlier version of the OS.
 
 ## System Requirements
 
-* macOS 10.12 Sierra host operating system (may also work with 10.10 and 10.11)
+* macOS 10.13 High Sierra host operating system (may also work with 10.10, 10.11, and 10.12)
 * At least 8 GB RAM (16 GB recommended)
 * At least 2 cores (4 recommended)
-* At least 30 GB of available disk space
+* At least 30 GB of available disk space (60 GB recommended)
 
 ## Dependencies
 
-The following software is required. Versions other than those mentioned may work, but have not been tested:
+The following software is required. Versions other than those mentioned may work, but these are the latest versions tested:
 
-* VMware Fusion 8.5.1
-* Vagrant 1.8.6
-* Vagrant VMware Fusion Plugin 4.0.14
+* VMware Fusion 10.1.1
+* Vagrant 2.0.1
+* Vagrant VMware Fusion Plugin 5.0.4
 
 [Get VMware Fusion](http://www.vmware.com/products/fusion.html)
 //
@@ -49,6 +51,12 @@ The `vagrant-box-macos.rb` script is just a wrapper around the other scripts inc
     $ bin/create_flavor_box.sh macos1012 vanilla box/macos1012-vanilla.box macos1012-vanilla
     $ vagrant box add box/macos1012-vanilla.box --name macos1012-vanilla
 
+To create a box with a macOS 10.13 High Sierra guest operating system from scratch, first download and install the [OS X 10.11 El Capitan](https://itunes.apple.com/app/os-x-el-capitan/id1147835434?mt=12) and [macOS 10.13 High Sierra](http://appstore.com/mac/macoshighsierra) installer apps, and then run:
+
+    $ sudo ./vagrant-box-macos.rb --installer-path "/Applications/Install OS X El Capitan.app" \
+                                  --flavor-name macos1013 \
+                                  --flavor-box-name macos1013
+
 ## Details
 
 ### vagrant-box-macos.rb
@@ -69,13 +77,17 @@ This script requires patience. The script my take 30 minutes, or longer, to comp
 
 ### bin/create_flavor_box.sh
 
-The `bin/create_flavor_box.sh` script provisions a base box with a flavor. Flavors are defined by Vagrantfiles that include provision directives. The flavor box is created by booting the base box using the flavor Vagrantfile and then repackaging the resulting machine.
+The `bin/create_flavor_box.sh` script provisions a base box with a flavor. Flavors are defined by Vagrantfiles that include provision directives, and an optional `provision` script. The flavor box is created by booting the base box using the flavor Vagrantfile, running the `provision` script, and then repackaging the resulting machine.
 
 ## Flavors
 
 ### vanilla
 
 The `vanilla` flavor provisions a minimal environment by installing the Xcode command-line tools and setting some useful defaults for running the operating system in a VM, including screensaver and power settings and the computer name. This flavor finishes provisioning by installing all available software updates.
+
+### macos1013
+
+The `macos1013` flavor syncs the High Sierra installer app into the vagrant machine, and then uses the `startosinstall` tool from the installer app bundle to begin an automated upgrade to High Sierra.
 
 ### template
 

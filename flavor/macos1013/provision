@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "Starting upgrade..."
+vagrant ssh -c "sudo /Applications/Install\ macOS\ High\ Sierra.app/Contents/Resources/startosinstall --nointeraction"
+
+printf "Waiting for first part of installation to complete..."
+sleep 10
+until vagrant ssh -c "true"; do
+  printf "."
+  sleep 10
+done
+
+printf "Waiting for second part of installation to complete..."
+sleep 10
+while vagrant ssh -c "pgrep -q 'Installer Progress'"; do
+  printf "."
+  sleep 10
+done
