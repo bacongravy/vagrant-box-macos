@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'json'
 require 'optparse'
 
 BIN_DIR = "#{File.dirname(__FILE__)}/bin"
@@ -56,6 +57,25 @@ def flavor_box_added?
   $options[:flavor_box_name] && box_added?($options[:flavor_box_name])
 end
 
+def get_latest_supported_installer_path
+  installer_path = "/Applications/Install macOS Sierra.app"
+  if File.exist?(installer_path)
+    begin
+      install_info_json = IO.popen(["plutil", "-convert", "json", "#{installer_path}/Contents/SharedSupport/InstallInfo.plist", "-o", "-"]).read
+      install_info = JSON.parse install_info_json
+      product_version = install_info["System Image Info"]["version"].split(".")
+      product_version_minor = product_version[2].to_i
+      return installer_path if product_version_minor < 4
+    rescue
+    end
+  end
+  installer_paths = ["/Applications/Install OS X El Capitan.app", "/Applications/Install OS X Yosemite.app"]
+  while installer_path = installer_paths.shift
+    return installer_path if File.exists?(installer_path)
+  end
+  return nil
+end
+
 $options = {}
 
 OptionParser.new do |o|
@@ -100,10 +120,8 @@ end
 
 if $actions[:get_version] || $actions[:create_image]
   unless $options[:installer_path]
-    installer_paths = ["/Applications/Install macOS Sierra.app", "/Applications/Install OS X El Capitan.app", "/Applications/Install OS X Yosemite.app"]
-    while $options[:installer_path] = installer_paths.shift
-      break if File.exists?($options[:installer_path])
-    end
+    $options[:installer_path] = get_latest_supported_installer_path
+    log_info "Found installer app: #{File.basename $options[:installer_path]}"
   end
   if !$options[:installer_path] || !File.exists?($options[:installer_path])
     bail "Installer app not found."
