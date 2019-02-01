@@ -1,3 +1,7 @@
+### Important Notice
+
+**This project is no longer being maintained. Its successor is the [macinbox](https://www.github.com/bacongravy/macinbox) project.**
+
 # vagrant-box-macos
 
 Scripts for building Vagrant boxes for VMware Fusion that boot macOS.
